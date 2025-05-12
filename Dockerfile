@@ -1,15 +1,13 @@
-FROM eclipse-temurin:11-jdk AS build
+FROM maven:3.8-openjdk-11 AS build
 
 WORKDIR /app
 
-# Copiar archivos de Maven
-COPY mvnw .
-COPY .mvn .mvn
+# Copiar archivos del proyecto
 COPY pom.xml .
 COPY src src
 
 # Construir la aplicación sin ejecutar pruebas
-RUN ./mvnw package -DskipTests
+RUN mvn package -DskipTests
 
 # Usar una imagen más ligera para producción
 FROM eclipse-temurin:11-jre
