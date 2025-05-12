@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Favicon Generator</title>
+</head>
+<body>
+    <p>Este archivo genera un favicon.png para el Conversor de Divisas.</p>
+    <canvas id="faviconCanvas" width="32" height="32" style="border:1px solid #000;"></canvas>
+    <br>
+    <a id="downloadLink" download="favicon.png">Descargar favicon.png</a>
+    
+    <script>
+        // Función para dibujar el icono
+        function drawFavicon() {
+            const canvas = document.getElementById('faviconCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Fondo circular
+            ctx.beginPath();
+            ctx.arc(16, 16, 14, 0, Math.PI * 2);
+            ctx.fillStyle = '#0d6efd';
+            ctx.fill();
+            
+            // Símbolo de moneda ($)
+            ctx.strokeStyle = 'white';
+            ctx.lineWidth = 2.5;
+            ctx.lineCap = 'round';
+            
+            // Línea vertical
+            ctx.beginPath();
+            ctx.moveTo(16, 6);
+            ctx.lineTo(16, 26);
+            ctx.stroke();
+            
+            // Símbolo $ curvo
+            ctx.beginPath();
+            ctx.moveTo(16, 8);
+            ctx.bezierCurveTo(12, 8, 10, 10, 10, 13);
+            ctx.bezierCurveTo(10, 16, 12, 17, 16, 17);
+            ctx.bezierCurveTo(20, 17, 22, 18, 22, 21);
+            ctx.bezierCurveTo(22, 24, 20, 26, 16, 26);
+            ctx.stroke();
+            
+            // Crear enlace de descarga
+            const link = document.getElementById('downloadLink');
+            link.href = canvas.toDataURL('image/png');
+        }
+        
+        // Ejecutar cuando se carga la página
+        window.onload = drawFavicon;
+    </script>
+</body>
+</html> 
