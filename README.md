@@ -7,7 +7,8 @@
 
 Una herramienta **fácil y rápida** para convertir entre monedas de todo el mundo y criptomonedas. Ideal para viajeros, inversores o cualquier persona que necesite hacer conversiones de divisas con tasas actualizadas.
 
-![Captura de pantalla](https://via.placeholder.com/800x400?text=Captura+de+la+aplicaci%C3%B3n)
+![image](https://github.com/user-attachments/assets/9f95dcbf-5988-4dba-8c90-f181ba4d4301)
+
 
 ## ✨ Características principales
 
@@ -25,7 +26,7 @@ Una herramienta **fácil y rápida** para convertir entre monedas de todo el mun
 La forma más sencilla de usar el conversor es accediendo a través de su navegador web:
 
 1. Abra su navegador favorito
-2. Visite la dirección: `http://localhost:9080` (si está instalada localmente)
+2. Visite la dirección: `conversor-divisas.daikyri.tech` (si no abre con ese link, prueba con este: `https://conversor-divisas-zdrwd.ondigitalocean.app/`)
 3. ¡Listo para convertir!
 
 ### Instalación local (para usuarios avanzados)
@@ -46,7 +47,6 @@ Si desea instalar la aplicación en su propio equipo:
 4. Ingrese la cantidad a convertir
 5. Haga clic en "Convertir"
 
-![Guía divisas](https://via.placeholder.com/600x300?text=Guía+de+uso+divisas)
 
 ### Conversión de criptomonedas
 
@@ -56,14 +56,18 @@ Si desea instalar la aplicación en su propio equipo:
 4. Ingrese la cantidad a convertir
 5. Haga clic en "Convertir"
 
-![Guía cripto](https://via.placeholder.com/600x300?text=Guía+de+uso+criptomonedas)
 
 ### Visualización de gráficos
 
 Después de realizar una conversión, la aplicación muestra automáticamente:
 
 - **Evolución de tasas** - Gráfico de línea que muestra la evolución de la tasa de cambio en los últimos 7 días
+![image](https://github.com/user-attachments/assets/0ed15560-2330-436d-8cb0-493163200996)
+
+
 - **Distribución de monedas** - Gráfico circular que muestra las monedas más utilizadas
+![image](https://github.com/user-attachments/assets/b01f15a9-6844-403e-9beb-03f5c5b512cb)
+
 - **Tipos de conversión** - Distribución entre conversiones de divisas tradicionales y criptomonedas
 
 ### Cambiar entre modo claro y oscuro
@@ -94,13 +98,5 @@ No, la aplicación necesita conexión a Internet para obtener las tasas de cambi
 
 **¿Mis conversiones son privadas?**  
 Sí, sus conversiones se almacenan localmente y no se comparten con terceros.
-
-## 🛠️ Soporte técnico
-
-Si encuentra algún problema o tiene alguna pregunta:
-
-- 📧 Contacte por correo: soporte@conversor-divisas.com
-- 🌐 Visite nuestro sitio web: www.conversor-divisas.com/soporte
-- 📱 Línea de ayuda: +1-800-CONVERT
 
 ## 📜 Desarrollado como parte del desafío Alura por Daikyri 
