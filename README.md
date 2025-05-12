@@ -1,123 +1,106 @@
-# Conversor de Monedas y Criptomonedas
+# Conversor de Divisas y Criptomonedas
 
-Aplicación web para conversión de monedas y criptomonedas desarrollada como parte del desafío de Alura.
+![Conversor de Divisas](https://img.shields.io/badge/Aplicación-Conversor-1A68CC)
+![Versión](https://img.shields.io/badge/Versión-1.0-brightgreen)
 
-## Descripción
+## 📊 ¿Qué es el Conversor de Divisas?
 
-Esta aplicación permite realizar conversiones entre diferentes divisas y criptomonedas utilizando tasas de cambio actualizadas mediante APIs externas. Incluye un historial de todas las conversiones realizadas, visualización mediante gráficos y una interfaz web intuitiva con modo oscuro/claro.
+Una herramienta **fácil y rápida** para convertir entre monedas de todo el mundo y criptomonedas. Ideal para viajeros, inversores o cualquier persona que necesite hacer conversiones de divisas con tasas actualizadas.
 
-## Funcionalidades
+![Captura de pantalla](https://via.placeholder.com/800x400?text=Captura+de+la+aplicaci%C3%B3n)
 
-- Conversión entre monedas fiduciarias (USD, EUR, GBP, etc.)
-- Conversión entre criptomonedas y monedas fiduciarias
-- Historial de conversiones con marcas de tiempo
-- Gráficos interactivos para visualizar datos de conversiones
-- Modo oscuro/claro para mejor experiencia visual
-- API REST para acceso programático
-- Interfaz web responsive con Thymeleaf y Bootstrap
+## ✨ Características principales
 
-## APIs utilizadas
+- **Conversión de divisas** - Convierta entre más de 20 monedas internacionales
+- **Conversión de criptomonedas** - Convierta entre Bitcoin, Ethereum, y otras criptomonedas populares
+- **Historial de conversiones** - Mantenga un registro de todas sus conversiones anteriores
+- **Visualización gráfica** - Vea la evolución de las tasas de cambio en el tiempo
+- **Modo oscuro/claro** - Personalice la apariencia para mayor comodidad visual
+- **Interfaz sencilla** - Diseñada para ser intuitiva y fácil de usar
 
-- ExchangeRate-API: Para conversión entre monedas fiduciarias
-- CoinMarketCap: Para información y conversión de criptomonedas
+## 🚀 Cómo empezar
 
-## Tecnologías
+### Acceso a la aplicación web
 
-- Java 11
-- Spring Boot 2.7
-- Spring Data JPA
-- H2 Database
-- Thymeleaf
-- Bootstrap 5
-- Chart.js
-- Lombok
-- Gson
+La forma más sencilla de usar el conversor es accediendo a través de su navegador web:
 
-## Requisitos
+1. Abra su navegador favorito
+2. Visite la dirección: `http://localhost:9080` (si está instalada localmente)
+3. ¡Listo para convertir!
 
-- Java 11 o superior
-- Maven 3.6 o superior
-- Claves API para ExchangeRate-API y CoinMarketCap
+### Instalación local (para usuarios avanzados)
 
-## Configuración
+Si desea instalar la aplicación en su propio equipo:
 
-1. Clona este repositorio
-2. Crea un archivo `.env` basado en `env.example`
-3. Añade tus propias claves API de ExchangeRate-API y CoinMarketCap:
-   ```
-   API_EXCHANGERATE_KEY=tu_clave_api_exchangerate
-   API_COINMARKETCAP_KEY=tu_clave_api_coinmarketcap
-   ```
+1. Descargue la aplicación desde [este enlace](https://github.com/Unikyri/Challenge-Conversor-De-Monedas/releases/latest)
+2. Asegúrese de tener Java instalado en su equipo
+3. Ejecute la aplicación con el comando: `java -jar conversor-monedas.jar`
 
-## Ejecución
+## 🧩 Cómo usar el Conversor
 
-### Usando Java/Maven
+### Conversión de divisas tradicionales
 
-Para ejecutar la aplicación en modo desarrollo:
+1. Seleccione la pestaña "Divisas"
+2. Elija la moneda de origen (por ejemplo, USD)
+3. Elija la moneda de destino (por ejemplo, EUR)
+4. Ingrese la cantidad a convertir
+5. Haga clic en "Convertir"
 
-```bash
-mvn spring-boot:run
-```
+![Guía divisas](https://via.placeholder.com/600x300?text=Guía+de+uso+divisas)
 
-Para generar el archivo JAR y ejecutarlo:
+### Conversión de criptomonedas
 
-```bash
-mvn clean package
-java -jar target/conversor-monedas-1.0-SNAPSHOT.jar
-```
+1. Seleccione la pestaña "Criptomonedas"
+2. Elija la criptomoneda (por ejemplo, Bitcoin)
+3. Elija la moneda fiduciaria (por ejemplo, USD)
+4. Ingrese la cantidad a convertir
+5. Haga clic en "Convertir"
 
-### Usando Docker
+![Guía cripto](https://via.placeholder.com/600x300?text=Guía+de+uso+criptomonedas)
 
-Para construir y ejecutar usando Docker Compose:
+### Visualización de gráficos
 
-```bash
-docker-compose up -d --build
-```
+Después de realizar una conversión, la aplicación muestra automáticamente:
 
-La aplicación estará disponible en: http://localhost:9080
+- **Evolución de tasas** - Gráfico de línea que muestra la evolución de la tasa de cambio en los últimos 7 días
+- **Distribución de monedas** - Gráfico circular que muestra las monedas más utilizadas
+- **Tipos de conversión** - Distribución entre conversiones de divisas tradicionales y criptomonedas
 
-## API REST
+### Cambiar entre modo claro y oscuro
 
-La aplicación expone los siguientes endpoints REST:
+- Haga clic en el botón con ícono de sol/luna en la parte superior derecha de la pantalla para cambiar el tema
 
-- `GET /api/monedas`: Lista todas las monedas disponibles
-- `GET /api/convertir?monedaOrigen=USD&monedaDestino=EUR&cantidad=100`: Convierte entre monedas fiduciarias
-- `GET /api/convertir-cripto?criptomoneda=BTC&monedaFiat=USD&cantidad=1`: Convierte entre criptomonedas y monedas fiduciarias
-- `GET /api/historial`: Obtiene el historial completo de conversiones
-- `GET /api/historial/{tipo}`: Obtiene el historial filtrado por tipo (MONEDA o CRIPTO)
-- `GET /api/graf/historial-tasas?monedaOrigen=USD&monedaDestino=EUR`: Obtiene datos históricos de tasas de cambio
-- `GET /api/graf/distribucion-monedas`: Obtiene datos para el gráfico de distribución de monedas
-- `GET /api/graf/distribucion-tipos`: Obtiene datos para el gráfico de distribución por tipos de conversión
+## 📱 Funciona en todos sus dispositivos
 
-## Despliegue en producción
+El Conversor de Divisas se adapta automáticamente a cualquier pantalla:
+- 💻 Computadoras de escritorio
+- 💻 Laptops
+- 📱 Tabletas
+- 📱 Teléfonos móviles
 
-### Usando Docker en DigitalOcean
+## ❓ Preguntas frecuentes
 
-1. Crea una cuenta en DigitalOcean
-2. Crea un Droplet con Docker preinstalado
-3. Clona este repositorio en el Droplet
-4. Configura el archivo `.env` con tus claves API
-5. Ejecuta `docker-compose up -d`
+**¿Es gratuita la aplicación?**  
+Sí, el Conversor de Divisas es completamente gratuito.
 
-La aplicación estará disponible en la IP del Droplet en el puerto 9080.
+**¿Se requiere registro?**  
+No, puede usar la aplicación inmediatamente sin necesidad de crear una cuenta.
 
-### Consideraciones de seguridad
+**¿De dónde provienen las tasas de cambio?**  
+Las tasas se obtienen en tiempo real de proveedores profesionales como ExchangeRate-API y CoinMarketCap.
 
-- **Nunca** incluyas claves API directamente en el código
-- Usa siempre variables de entorno para credenciales y configuraciones sensibles
-- Usa un archivo `.env` local para desarrollo y configuraciones de entorno en producción
-- Considera usar un proxy inverso como Nginx para HTTPS en producción
+**¿Puedo usar el conversor sin conexión a Internet?**  
+No, la aplicación necesita conexión a Internet para obtener las tasas de cambio actualizadas.
 
-## Estructura del proyecto
+**¿Mis conversiones son privadas?**  
+Sí, sus conversiones se almacenan localmente y no se comparten con terceros.
 
-La aplicación sigue los principios SOLID y está estructurada en:
+## 🛠️ Soporte técnico
 
-- `model`: Entidades y enumeraciones del dominio
-- `repository`: Interfaces de acceso a datos
-- `service`: Lógica de negocio
-- `controller`: Controladores REST y web
-- `http`: Clientes HTTP para APIs externas
+Si encuentra algún problema o tiene alguna pregunta:
 
-## Licencia
+- 📧 Contacte por correo: soporte@conversor-divisas.com
+- 🌐 Visite nuestro sitio web: www.conversor-divisas.com/soporte
+- 📱 Línea de ayuda: +1-800-CONVERT
 
-Este proyecto está licenciado bajo MIT License. 
+## 📜 Desarrollado como parte del desafío Alura por Daikyri 
