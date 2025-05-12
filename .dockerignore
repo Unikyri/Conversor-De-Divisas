@@ -1,0 +1,34 @@
+# Archivos de Maven/Gradle
+target/
+build/
+.gradle/
+
+# Archivos de Git
+.git/
+.gitignore
+
+# Archivos de IDE
+.idea/
+*.iml
+*.iws
+*.ipr
+.settings/
+.classpath
+.project
+.vscode/
+
+# Archivos temporales
+*.log
+*.tmp
+*.temp
+
+# Otros archivos
+README.md
+LICENSE
+*.md
+data/
+
+# Archivos Docker
+Dockerfile
+docker-compose.yml
+.dockerignore 

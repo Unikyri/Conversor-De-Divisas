@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "9080:9080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL}
+      - SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
+      - API_EXCHANGERATE_KEY=${API_EXCHANGERATE_KEY}
+      - API_COINMARKETCAP_KEY=${API_COINMARKETCAP_KEY}
+      - PORT=9080
+    volumes:
+      - ./data:/data
+    restart: always
+    env_file:
+      - .env
+
+  # Puedes agregar más servicios como una base de datos persistente
+  # postgres:
+  #   image: postgres:13
+  #   environment:
+  #     - POSTGRES_DB=conversor
+  #     - POSTGRES_USER=postgres
+  #     - POSTGRES_PASSWORD=password
+  #   ports:
+  #     - "5432:5432"
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+  #   restart: always
+
+# Definición de volúmenes
+volumes:
+  postgres_data: 

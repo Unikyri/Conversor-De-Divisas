@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conversor de Divisas</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Variables para temas */
+        :root {
+            --bg-color: #f0f2f5;
+            --text-color: #212529;
+            --secondary-text: #6c757d;
+            --card-bg: #fff;
+            --card-border: rgba(0,0,0,0.1);
+            --header-bg: #fff;
+            --footer-bg: #343a40;
+            --footer-text: #fff;
+            --primary-color: #0d6efd;
+            --chart-grid: rgba(0,0,0,0.1);
+            --badge-text: inherit;
+            --select-text: #212529;
+            --table-text: #212529;
+        }
+        
+        [data-theme="dark"] {
+            --bg-color: #121212;
+            --text-color: #e0e0e0;
+            --secondary-text: #adb5bd;
+            --card-bg: #1e1e1e;
+            --card-border: rgba(255,255,255,0.1);
+            --header-bg: #1e1e1e;
+            --footer-bg: #111111;
+            --footer-text: #f0f0f0;
+            --primary-color: #4d94ff;
+            --chart-grid: rgba(255,255,255,0.1);
+            --badge-text: #212529;
+            --select-text: #e0e0e0;
+            --table-text: #e0e0e0;
+        }
+        
+        body {
+            padding-top: 2rem;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: all 0.3s ease;
+        }
+        .card {
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+            border-radius: 12px;
+            border: none;
+            background-color: var(--card-bg);
+            border-color: var(--card-border);
+        }
+        .card-header {
+            background-color: var(--header-bg);
+            border-bottom: 1px solid rgba(0,0,0,0.08);
+            border-radius: 12px 12px 0 0 !important;
+        }
+        .conversion-result {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #198754;
+            margin-top: 1rem;
+            padding: 10px;
+            background-color: rgba(25, 135, 84, 0.1);
+            border-radius: 8px;
+        }
+        .nav-tabs .nav-link {
+            font-weight: 500;
+            padding: 12px 20px;
+            color: var(--text-color);
+            border: none;
+            transition: all 0.3s ease;
+        }
+        .nav-tabs .nav-link.active {
+            color: var(--primary-color);
+            background-color: var(--card-bg);
+            border-bottom: 3px solid var(--primary-color);
+        }
+        .btn-primary {
+            background-color: #0d6efd;
+            border: none;
+            padding: 10px 20px;
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            background-color: #0b5ed7;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(13, 110, 253, 0.2);
+        }
+        .form-control, .form-select {
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+        .table th {
+            font-weight: 600;
+            color: #495057;
+        }
+        footer {
+            background-color: var(--footer-bg) !important;
+            color: var(--footer-text);
+        }
+        .app-title {
+            color: #0d6efd;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+        .gradient-text {
+            background: linear-gradient(90deg, #0d6efd, #6610f2);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+        }
+        .badge {
+            padding: 6px 10px;
+            font-weight: 500;
+        }
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+            margin: 20px 0;
+        }
+        .chart-card {
+            padding: 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-top: 20px;
+        }
+        .chart-title {
+            color: #495057;
+            font-weight: 600;
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+        }
+        .theme-switch {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 10px;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--card-bg);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border: 1px solid var(--card-border);
+            cursor: pointer;
+        }
+        .chart-context {
+            font-size: 0.9rem;
+            color: var(--secondary-text);
+            margin-bottom: 15px;
+            font-style: italic;
+        }
+        .table {
+            color: var(--table-text);
+        }
+        .table-light {
+            background-color: var(--header-bg);
+            color: var(--text-color);
+        }
+        /* Fondos y decoraciones */
+        .bg-pattern {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            opacity: 0.3;
+            z-index: -1;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+        .form-select option {
+            background-color: var(--card-bg);
+            color: var(--select-text);
+        }
+        .badge.bg-warning {
+            color: var(--badge-text);
+        }
+        input::placeholder {
+            color: var(--secondary-text);
+            opacity: 0.7;
+        }
+        .nav-tabs {
+            border-bottom-color: var(--card-border);
+        }
+        .table-hover tbody tr:hover {
+            background-color: rgba(13, 110, 253, 0.05);
+            color: var(--text-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center mb-4 app-title">
+            <i class="fas fa-exchange-alt me-2"></i>
+            <span class="gradient-text">Conversor de Divisas y Criptomonedas</span>
+        </h1>
+        
+        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <span th:text="${error}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        
+        <div class="row justify-content-center">
+            <div class="col-md-10">
+                <div class="card">
+                    <div class="card-header">
+                        <ul class="nav nav-tabs card-header-tabs" id="conversionTab" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" 
+                                        th:classappend="${activarTabCripto == null or activarTabMonedas != null} ? 'active' : ''" 
+                                        id="monedas-tab" data-bs-toggle="tab" data-bs-target="#monedas" 
+                                        type="button" role="tab" aria-controls="monedas" 
+                                        th:attr="aria-selected=${activarTabCripto == null or activarTabMonedas != null}">
+                                    <i class="fas fa-dollar-sign me-1"></i> Divisas
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link"
+                                        th:classappend="${activarTabCripto != null} ? 'active' : ''"
+                                        id="cripto-tab" data-bs-toggle="tab" data-bs-target="#cripto" 
+                                        type="button" role="tab" aria-controls="cripto" 
+                                        th:attr="aria-selected=${activarTabCripto != null}">
+                                    <i class="fab fa-bitcoin me-1"></i> Criptomonedas
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="tab-content" id="conversionTabContent">
+                            <!-- Tab de conversión de divisas -->
+                            <div class="tab-pane fade" 
+                                 th:classappend="${activarTabCripto == null or activarTabMonedas != null} ? 'show active' : ''" 
+                                 id="monedas" role="tabpanel" aria-labelledby="monedas-tab">
+                                <form th:action="@{/convertir}" method="post" class="needs-validation" novalidate>
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label for="monedaOrigen" class="form-label">
+                                                    <i class="fas fa-globe me-1"></i> Divisa de origen
+                                                </label>
+                                                <select class="form-select" id="monedaOrigen" name="monedaOrigen" required>
+                                                    <option value="">Seleccione una divisa</option>
+                                                    <option th:each="moneda : ${monedas}" 
+                                                            th:value="${moneda.key}" 
+                                                            th:text="${moneda.key + ' - ' + moneda.value}"
+                                                            th:selected="${moneda.key == monedaOrigenSeleccionada}"></option>
+                                                </select>
+                                                <div class="invalid-feedback">
+                                                    Por favor seleccione una divisa de origen.
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label for="monedaDestino" class="form-label">
+                                                    <i class="fas fa-globe me-1"></i> Divisa de destino
+                                                </label>
+                                                <select class="form-select" id="monedaDestino" name="monedaDestino" required>
+                                                    <option value="">Seleccione una divisa</option>
+                                                    <option th:each="moneda : ${monedas}" 
+                                                            th:value="${moneda.key}" 
+                                                            th:text="${moneda.key + ' - ' + moneda.value}"
+                                                            th:selected="${moneda.key == monedaDestinoSeleccionada}"></option>
+                                                </select>
+                                                <div class="invalid-feedback">
+                                                    Por favor seleccione una divisa de destino.
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label for="cantidad" class="form-label">
+                                                    <i class="fas fa-calculator me-1"></i> Cantidad
+                                                </label>
+                                                <input type="number" class="form-control" id="cantidad" name="cantidad" 
+                                                       step="0.01" min="0.01" required
+                                                       th:value="${cantidadSeleccionada}"
+                                                       placeholder="Ingrese la cantidad">
+                                                <div class="invalid-feedback">
+                                                    Por favor ingrese una cantidad válida.
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="d-grid gap-2 mt-3">
+                                        <button type="submit" class="btn btn-primary btn-lg">
+                                            <i class="fas fa-exchange-alt me-2"></i> Convertir
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                            
+                            <!-- Tab de conversión de criptomonedas -->
+                            <div class="tab-pane fade" 
+                                 th:classappend="${activarTabCripto != null} ? 'show active' : ''" 
+                                 id="cripto" role="tabpanel" aria-labelledby="cripto-tab">
+                                <form th:action="@{/convertir-cripto}" method="post" class="needs-validation" novalidate>
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label for="criptomoneda" class="form-label">
+                                                    <i class="fab fa-bitcoin me-1"></i> Criptomoneda
+                                                </label>
+                                                <select class="form-select" id="criptomoneda" name="criptomoneda" required>
+                                                    <option value="">Seleccione una criptomoneda</option>
+                                                    <option value="BTC" th:selected="${criptomonedaSeleccionada == 'BTC'}">BTC - Bitcoin</option>
+                                                    <option value="ETH" th:selected="${criptomonedaSeleccionada == 'ETH'}">ETH - Ethereum</option>
+                                                    <option value="XRP" th:selected="${criptomonedaSeleccionada == 'XRP'}">XRP - Ripple</option>
+                                                    <option value="LTC" th:selected="${criptomonedaSeleccionada == 'LTC'}">LTC - Litecoin</option>
+                                                    <option value="ADA" th:selected="${criptomonedaSeleccionada == 'ADA'}">ADA - Cardano</option>
+                                                    <option value="DOT" th:selected="${criptomonedaSeleccionada == 'DOT'}">DOT - Polkadot</option>
+                                                    <option value="SOL" th:selected="${criptomonedaSeleccionada == 'SOL'}">SOL - Solana</option>
+                                                </select>
+                                                <div class="invalid-feedback">
+                                                    Por favor seleccione una criptomoneda.
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label for="monedaFiat" class="form-label">
+                                                    <i class="fas fa-dollar-sign me-1"></i> Divisa fiduciaria
+                                                </label>
+                                                <select class="form-select" id="monedaFiat" name="monedaFiat" required>
+                                                    <option value="">Seleccione una divisa</option>
+                                                    <option value="USD" th:selected="${monedaFiatSeleccionada == 'USD'}">USD - Dólar estadounidense</option>
+                                                    <option value="EUR" th:selected="${monedaFiatSeleccionada == 'EUR'}">EUR - Euro</option>
+                                                    <option value="GBP" th:selected="${monedaFiatSeleccionada == 'GBP'}">GBP - Libra esterlina</option>
+                                                    <option value="JPY" th:selected="${monedaFiatSeleccionada == 'JPY'}">JPY - Yen japonés</option>
+                                                </select>
+                                                <div class="invalid-feedback">
+                                                    Por favor seleccione una divisa fiduciaria.
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label for="cantidadCripto" class="form-label">
+                                                    <i class="fas fa-calculator me-1"></i> Cantidad
+                                                </label>
+                                                <input type="number" class="form-control" id="cantidadCripto" name="cantidad" 
+                                                       step="0.00000001" min="0.00000001" required
+                                                       th:value="${cantidadCriptoSeleccionada}"
+                                                       placeholder="Ingrese la cantidad">
+                                                <div class="invalid-feedback">
+                                                    Por favor ingrese una cantidad válida.
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="d-grid gap-2 mt-3">
+                                        <button type="submit" class="btn btn-primary btn-lg">
+                                            <i class="fas fa-exchange-alt me-2"></i> Convertir
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        
+                        <!-- Resultado de la conversión -->
+                        <div th:if="${resultadoConversion}" class="mt-4 text-center conversion-result">
+                            <i class="fas fa-check-circle me-2"></i>
+                            <span th:text="${resultadoConversion}"></span>
+                        </div>
+                        
+                        <!-- Gráfico de tasa de cambio (aparece solo cuando hay una conversión) -->
+                        <div th:if="${resultadoConversion}" class="chart-card mt-4">
+                            <h4 class="chart-title">
+                                <i class="fas fa-chart-line me-2"></i>
+                                Evolución de la tasa de cambio
+                                <span id="rateChartTitle" class="ms-2 text-primary"></span>
+                            </h4>
+                            <p class="chart-context" id="rateChartContext">
+                                Mostrando datos históricos de la tasa de cambio entre las monedas seleccionadas en los últimos 7 días.
+                                Los datos son obtenidos del historial de conversiones previas o generados en base a la tasa actual.
+                            </p>
+                            <div class="chart-container">
+                                <canvas id="rateChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Gráfico de distribución de conversiones -->
+                <div th:if="${!#lists.isEmpty(historial)}" class="card">
+                    <div class="card-header">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">
+                                <i class="fas fa-chart-pie me-2"></i> 
+                                Estadísticas de uso
+                            </h5>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6 class="text-center mb-3">Monedas más utilizadas</h6>
+                                <p class="chart-context text-center">
+                                    Distribución de las monedas más frecuentes en todas las conversiones realizadas.
+                                    Basado en el historial de conversiones registradas.
+                                </p>
+                                <div class="chart-container" style="height: 250px;">
+                                    <canvas id="currencyDistributionChart"></canvas>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="text-center mb-3">Tipos de conversión</h6>
+                                <p class="chart-context text-center">
+                                    Proporción entre conversiones de divisas fiduciarias y criptomonedas.
+                                    Basado en el historial de conversiones registradas.
+                                </p>
+                                <div class="chart-container" style="height: 250px;">
+                                    <canvas id="typeDistributionChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Historial de conversiones -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">
+                                <i class="fas fa-history me-2"></i>
+                                Historial de conversiones recientes
+                            </h5>
+                            <a th:href="@{/historial}" class="btn btn-outline-primary">
+                                <i class="fas fa-list me-1"></i> Ver historial completo
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th class="ps-3">Origen</th>
+                                        <th>Destino</th>
+                                        <th>Cantidad</th>
+                                        <th>Resultado</th>
+                                        <th>Tasa</th>
+                                        <th>Fecha/Hora</th>
+                                        <th class="pe-3">Tipo</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="conversion : ${historial}">
+                                        <td class="ps-3" th:text="${conversion.monedaOrigen}"></td>
+                                        <td th:text="${conversion.monedaDestino}"></td>
+                                        <td th:text="${#numbers.formatDecimal(conversion.cantidadOrigen, 1, 'COMMA', 8, 'POINT')}"></td>
+                                        <td th:text="${#numbers.formatDecimal(conversion.cantidadDestino, 1, 'COMMA', 8, 'POINT')}"></td>
+                                        <td th:text="${#numbers.formatDecimal(conversion.tasaCambio, 1, 'COMMA', 8, 'POINT')}"></td>
+                                        <td th:text="${#temporals.format(conversion.fechaHora, 'dd/MM/yyyy HH:mm:ss')}"></td>
+                                        <td class="pe-3">
+                                            <span th:if="${conversion.tipoConversion == 'MONEDA'}" class="badge bg-primary">
+                                                <i class="fas fa-dollar-sign me-1"></i> Divisa
+                                            </span>
+                                            <span th:if="${conversion.tipoConversion == 'CRIPTO'}" class="badge bg-warning text-dark">
+                                                <i class="fab fa-bitcoin me-1"></i> Cripto
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    <tr th:if="${#lists.isEmpty(historial)}">
+                                        <td colspan="7" class="text-center py-4">
+                                            <i class="fas fa-info-circle me-2"></i>
+                                            No hay conversiones en el historial
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer class="bg-dark text-white py-4 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 text-center text-md-start">
+                    <p class="mb-0">
+                        <i class="fas fa-code me-2"></i> Elaborado por Daikyri &copy; 2025
+                    </p>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <p class="mb-0">
+                        <i class="fas fa-exchange-alt me-2"></i> Conversor de Divisas - Desafío Alura
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Validación de formularios con Bootstrap
+        document.addEventListener('DOMContentLoaded', function() {
+            'use strict';
+            
+            // Fetch all the forms we want to apply custom Bootstrap validation styles to
+            var forms = document.querySelectorAll('.needs-validation');
+            
+            // Loop over them and prevent submission
+            Array.prototype.slice.call(forms).forEach(function(form) {
+                form.addEventListener('submit', function(event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    
+                    form.classList.add('was-validated');
+                }, false);
+            });
+            
+            // Inicializar gráficos si existen en la página
+            initCharts();
+        });
+        
+        function initCharts() {
+            // Crear un objeto global para almacenar las instancias de los gráficos
+            window.charts = {
+                rateChart: null,
+                currencyChart: null,
+                typeChart: null
+            };
+            
+            // Código para detectar si estamos en la pestaña de criptomonedas
+            function isCryptoTabActive() {
+                const cryptoTab = document.getElementById('cripto-tab');
+                if (cryptoTab) {
+                    return cryptoTab.classList.contains('active');
+                }
+                return false;
+            }
+            
+            // Gráfico de evolución de tasa de cambio (solo si hay resultado de conversión)
+            if (document.getElementById('rateChart')) {
+                // Obtener las monedas actuales de la conversión
+                let monedaOrigen = '';
+                let monedaDestino = '';
+                let nombreOrigen = '';
+                let nombreDestino = '';
+                
+                // Detectar si estamos en la pestaña de criptomonedas o divisas
+                const enPestanaCripto = isCryptoTabActive();
+                
+                if (!enPestanaCripto && document.getElementById('monedaOrigen') && document.getElementById('monedaDestino')) {
+                    const selectOrigen = document.getElementById('monedaOrigen');
+                    const selectDestino = document.getElementById('monedaDestino');
+                    
+                    monedaOrigen = selectOrigen.value;
+                    monedaDestino = selectDestino.value;
+                    
+                    // Obtener los nombres completos de las monedas
+                    if (selectOrigen.selectedIndex > 0) {
+                        nombreOrigen = selectOrigen.options[selectOrigen.selectedIndex].text;
+                    }
+                    if (selectDestino.selectedIndex > 0) {
+                        nombreDestino = selectDestino.options[selectDestino.selectedIndex].text;
+                    }
+                } else if (document.getElementById('criptomoneda') && document.getElementById('monedaFiat')) {
+                    const selectCripto = document.getElementById('criptomoneda');
+                    const selectFiat = document.getElementById('monedaFiat');
+                    
+                    monedaOrigen = selectCripto.value;
+                    monedaDestino = selectFiat.value;
+                    
+                    // Obtener los nombres completos de las monedas
+                    if (selectCripto.selectedIndex > 0) {
+                        nombreOrigen = selectCripto.options[selectCripto.selectedIndex].text;
+                    }
+                    if (selectFiat.selectedIndex > 0) {
+                        nombreDestino = selectFiat.options[selectFiat.selectedIndex].text;
+                    }
+                }
+                
+                // Actualizar el título del gráfico
+                const rateChartTitle = document.getElementById('rateChartTitle');
+                if (rateChartTitle && monedaOrigen && monedaDestino) {
+                    rateChartTitle.textContent = `${monedaOrigen} → ${monedaDestino}`;
+                    
+                    // Actualizar el contexto con información más específica
+                    const rateChartContext = document.getElementById('rateChartContext');
+                    if (rateChartContext) {
+                        rateChartContext.textContent = `Evolución histórica de la tasa de cambio de ${nombreOrigen || monedaOrigen} a ${nombreDestino || monedaDestino} en los últimos 7 días. Cada punto representa el valor de 1 ${monedaOrigen} en términos de ${monedaDestino}.`;
+                    }
+                }
+                
+                // Si tenemos monedas identificadas, hacer la petición a la API
+                if (monedaOrigen && monedaDestino) {
+                    console.log(`Solicitando datos históricos para ${monedaOrigen} → ${monedaDestino}`);
+                    fetch(`/api/graf/historial-tasas?monedaOrigen=${monedaOrigen}&monedaDestino=${monedaDestino}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            console.log('Datos recibidos del servidor:', data);
+                            console.log(`Puntos de datos recibidos: ${data.labels?.length || 0}`);
+                            createRateChart(data.labels, data.tasas, monedaOrigen, monedaDestino);
+                        })
+                        .catch(error => {
+                            console.error('Error al obtener datos del historial de tasas:', error);
+                            // Usar datos ficticios en caso de error
+                            createRateChartWithFakeData(monedaOrigen, monedaDestino);
+                        });
+                } else {
+                    // Si no podemos identificar las monedas, usar datos ficticios
+                    createRateChartWithFakeData();
+                }
+            }
+            
+            // Gráfico de distribución de monedas
+            if (document.getElementById('currencyDistributionChart')) {
+                fetch('/api/graf/distribucion-monedas')
+                    .then(response => response.json())
+                    .then(data => {
+                        createCurrencyDistributionChart(data.labels, data.data);
+                    })
+                    .catch(error => {
+                        console.error('Error al obtener datos de distribución de monedas:', error);
+                        // Usar datos ficticios en caso de error
+                        createCurrencyDistributionChartWithFakeData();
+                    });
+            }
+            
+            // Gráfico de distribución por tipo
+            if (document.getElementById('typeDistributionChart')) {
+                fetch('/api/graf/distribucion-tipos')
+                    .then(response => response.json())
+                    .then(data => {
+                        createTypeDistributionChart(data.labels, data.data);
+                    })
+                    .catch(error => {
+                        console.error('Error al obtener datos de distribución de tipos:', error);
+                        // Usar datos ficticios en caso de error
+                        createTypeDistributionChartWithFakeData();
+                    });
+            }
+        }
+        
+        // Funciones auxiliares para crear los gráficos
+        function createRateChart(labels, tasas, monedaOrigen, monedaDestino) {
+            const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+            const gridColor = isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
+            const textColor = isDarkMode ? '#e0e0e0' : '#666666';
+            const backgroundColor = isDarkMode ? 'rgba(77, 148, 255, 0.2)' : 'rgba(13, 110, 253, 0.1)';
+            const borderColor = isDarkMode ? '#4d94ff' : '#0d6efd';
+            const pointColor = isDarkMode ? '#ffffff' : '#0d6efd';
+            
+            // Formato de fecha más intuitivo
+            const formattedLabels = labels.map(label => {
+                // Si la API ya devuelve fechas en formato adecuado, usar directamente
+                if (label.includes(' ')) return label;
+                
+                // Si no, formatear según convención local
+                try {
+                    const date = new Date(label);
+                    return date.toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
+                } catch (e) {
+                    return label;
+                }
+            });
+            
+            const ctx = document.getElementById('rateChart').getContext('2d');
+            
+            // Destruir el gráfico existente si hay uno
+            if (window.charts.rateChart) {
+                window.charts.rateChart.destroy();
+            }
+            
+            window.charts.rateChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: formattedLabels,
+                    datasets: [{
+                        label: `1 ${monedaOrigen} = x ${monedaDestino}`,
+                        data: tasas,
+                        borderColor: borderColor,
+                        backgroundColor: backgroundColor,
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: pointColor,
+                        pointBorderColor: borderColor,
+                        pointRadius: 4,
+                        pointHoverRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                            labels: {
+                                color: textColor,
+                                font: {
+                                    weight: 'bold'
+                                }
+                            }
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                            backgroundColor: isDarkMode ? 'rgba(30, 30, 30, 0.9)' : 'rgba(255, 255, 255, 0.9)',
+                            titleColor: isDarkMode ? '#ffffff' : '#000000',
+                            bodyColor: isDarkMode ? '#e0e0e0' : '#333333',
+                            borderColor: isDarkMode ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.1)',
+                            borderWidth: 1,
+                            callbacks: {
+                                label: function(context) {
+                                    return `1 ${monedaOrigen} = ${context.raw.toFixed(6)} ${monedaDestino}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            grid: {
+                                color: gridColor
+                            },
+                            ticks: {
+                                color: textColor,
+                                callback: function(value) {
+                                    return value.toFixed(6);
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                color: gridColor
+                            },
+                            ticks: {
+                                color: textColor
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function createRateChartWithFakeData(monedaOrigen = 'EUR', monedaDestino = 'USD') {
+            // Generar fechas para los últimos 7 días
+            const dates = [];
+            const today = new Date();
+            
+            for (let i = 6; i >= 0; i--) {
+                const date = new Date();
+                date.setDate(today.getDate() - i);
+                dates.push(date.toLocaleDateString(undefined, { day: 'numeric', month: 'short' }));
+            }
+            
+            // Usar un valor base aleatorio para las tasas de ejemplo
+            const baseRate = 1.0 + Math.random();
+            const rates = dates.map(() => baseRate * (0.95 + Math.random() * 0.1));
+            
+            createRateChart(dates, rates, monedaOrigen, monedaDestino);
+        }
+        
+        function createCurrencyDistributionChart(labels, data) {
+            const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+            const textColor = isDarkMode ? '#e0e0e0' : '#666666';
+            const backgroundColor = isDarkMode ? 
+                ['#4d94ff', '#8c52ff', '#a96bff', '#e57bc9', '#ff6b84'] : 
+                ['#0d6efd', '#6610f2', '#6f42c1', '#d63384', '#dc3545'];
+            
+            const ctx = document.getElementById('currencyDistributionChart').getContext('2d');
+            
+            // Destruir el gráfico existente si hay uno
+            if (window.charts.currencyChart) {
+                window.charts.currencyChart.destroy();
+            }
+            
+            window.charts.currencyChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: backgroundColor,
+                        borderWidth: 1,
+                        borderColor: isDarkMode ? '#1e1e1e' : '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                color: textColor,
+                                padding: 10,
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: isDarkMode ? 'rgba(30, 30, 30, 0.9)' : 'rgba(255, 255, 255, 0.9)',
+                            titleColor: isDarkMode ? '#ffffff' : '#000000',
+                            bodyColor: isDarkMode ? '#e0e0e0' : '#333333',
+                            borderColor: isDarkMode ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.1)',
+                            borderWidth: 1,
+                            callbacks: {
+                                label: function(context) {
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = Math.round((context.raw / total) * 100);
+                                    return `${context.label}: ${context.raw} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function createCurrencyDistributionChartWithFakeData() {
+            const labels = ['USD', 'EUR', 'GBP', 'JPY', 'Otras'];
+            const data = [40, 25, 15, 10, 10];
+            
+            createCurrencyDistributionChart(labels, data);
+        }
+        
+        function createTypeDistributionChart(labels, data) {
+            const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+            const textColor = isDarkMode ? '#e0e0e0' : '#666666';
+            const backgroundColor = isDarkMode ? 
+                ['#4d94ff', '#ffcc33'] : 
+                ['#0d6efd', '#ffc107'];
+            
+            const ctx = document.getElementById('typeDistributionChart').getContext('2d');
+            
+            // Destruir el gráfico existente si hay uno
+            if (window.charts.typeChart) {
+                window.charts.typeChart.destroy();
+            }
+            
+            window.charts.typeChart = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: backgroundColor,
+                        borderWidth: 1,
+                        borderColor: isDarkMode ? '#1e1e1e' : '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                color: textColor,
+                                padding: 10,
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: isDarkMode ? 'rgba(30, 30, 30, 0.9)' : 'rgba(255, 255, 255, 0.9)',
+                            titleColor: isDarkMode ? '#ffffff' : '#000000',
+                            bodyColor: isDarkMode ? '#e0e0e0' : '#333333',
+                            borderColor: isDarkMode ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.1)',
+                            borderWidth: 1,
+                            callbacks: {
+                                label: function(context) {
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = Math.round((context.raw / total) * 100);
+                                    return `${context.label}: ${context.raw} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function createTypeDistributionChartWithFakeData() {
+            const labels = ['Divisas', 'Criptomonedas'];
+            const data = [65, 35];
+            
+            createTypeDistributionChart(labels, data);
+        }
+        
+        // Código para actualizar los gráficos cuando se cambia de pestaña
+        document.addEventListener('DOMContentLoaded', function() {
+            // Escuchar cambios de pestañas
+            const tabElements = document.querySelectorAll('button[data-bs-toggle="tab"]');
+            tabElements.forEach(tab => {
+                tab.addEventListener('shown.bs.tab', function(event) {
+                    // Reinicializar los gráficos si existen
+                    if (window.charts && window.charts.rateChart) {
+                        // Actualizar los gráficos con los nuevos datos
+                        setTimeout(initCharts, 100); // Pequeño retraso para asegurar que los elementos estén cargados
+                    }
+                });
+            });
+        });
+    </script>
+    <div class="bg-pattern"></div>
+    <button class="theme-switch" id="themeToggle" title="Cambiar tema">
+        <i class="fas fa-moon"></i>
+    </button>
+    <script>
+        // Código para el interruptor de tema
+        document.addEventListener('DOMContentLoaded', function() {
+            const themeToggle = document.getElementById('themeToggle');
+            const themeIcon = themeToggle.querySelector('i');
+            
+            // Verificar si hay un tema guardado en localStorage
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+            }
+            
+            // Manejar el cambio de tema
+            themeToggle.addEventListener('click', function() {
+                const currentTheme = document.documentElement.getAttribute('data-theme');
+                
+                if (currentTheme === 'dark') {
+                    document.documentElement.removeAttribute('data-theme');
+                    localStorage.setItem('theme', 'light');
+                    themeIcon.classList.remove('fa-sun');
+                    themeIcon.classList.add('fa-moon');
+                } else {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                    localStorage.setItem('theme', 'dark');
+                    themeIcon.classList.remove('fa-moon');
+                    themeIcon.classList.add('fa-sun');
+                }
+                
+                // Actualizar los gráficos si existen
+                if (window.charts) {
+                    for (let chart in window.charts) {
+                        if (window.charts[chart]) {
+                            window.charts[chart].update();
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html> 

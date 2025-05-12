@@ -1,0 +1,33 @@
+# Archivos compilados
+*.class
+
+# Archivos de paquete
+*.jar
+*.war
+*.ear
+
+# Directorios de compilación
+target/
+bin/
+out/
+build/
+
+# Archivos de IDE
+.idea/
+*.iml
+.classpath
+.project
+.settings/
+.vscode/
+
+# Logs
+*.log
+
+# Archivos del sistema operativo
+.DS_Store
+Thumbs.db
+
+# Variables de entorno
+.env
+.env.*
+!env.example 
